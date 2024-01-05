@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -9,6 +10,8 @@ public class Memorymaster {
     static String currentVal ="";
 
     static int lives =5;
+
+    static final Icon back = new ImageIcon("src/back.png");
 
     public int getLives()
     {
@@ -21,7 +24,8 @@ public class Memorymaster {
 
     //Randomizes the order of the icons and stores them in an array
     static ArrayList<String> assignButtons(List<JButton> buttons ){
-        String[] icons= {"A", "B", "C", "D", "E", "F", "G", "H"};
+        String[] icons= {"\uD83D\uDE42", "\uD83D\uDE80", "\uD83D\uDD25", "\uD83C\uDF19", "\uD83D\uDCB5", "\uD83D\uDD12", "\uD83D\uDDFF", "\uD83D\uDCE2"};
+        //🙂, 🚀, 🔥, 🌙, 💵, 🔒, 🗿, 📢
         Integer[] counts ={0, 0, 0, 0, 0, 0, 0, 0};
         ArrayList<String> assignments = new ArrayList<String>();
 
@@ -47,6 +51,7 @@ public class Memorymaster {
         }
         return assignments;
     }
+
     static  void handleBtnClick(JButton button, ArrayList<String>  assignments) throws InterruptedException
     {
 
@@ -60,8 +65,12 @@ public class Memorymaster {
         Timer tmr= new Timer(500, ((ignored) -> { // Wait 500ms before re-enabling the buttons
            clickedBtn.setText("");
            clickedBtn.setEnabled(true);
+           clickedBtn.setIcon(back);
+
            prevBtnTimeR.setText("");
            prevBtnTimeR.setEnabled(true);
+           prevBtnTimeR.setIcon(back);
+
            if(lives == 0)
            {
                clickedBtn.setEnabled(false);

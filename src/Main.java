@@ -3,15 +3,60 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.*;
+import java.util.Random;
 
 public class Main {
 
-    static void endGame(List<JButton> buttons)
+    static void endGame(List<JButton> buttons, ArrayList<String> assignments)
     {
-        for (JButton button: buttons)
-        {
-            button.setEnabled(false);
+
+        if(true) {
+            int i = 0;
+            for (JButton button : buttons) {
+                button.setEnabled(false);
+                button.setIcon(null);
+                button.setText(assignments.get(i));
+                //Fix a bug where the two previous buttons are not shown
+                i++;
+            }
+            System.out.println("You lost");
+
         }
+        else {
+            System.out.println("You won");
+        }
+    }
+
+    static void startGame(List<JButton> buttons, ArrayList<String> assignments, Icon back) //Reveal some of the cards at the beginning of the game
+    {
+        Random rand = new Random();
+        int randNum= rand.nextInt(16);
+        ArrayList<Integer>  randNums = new ArrayList<>();
+
+        for(int i= 0; i <4; i++)
+        {
+            if(randNums.contains(randNum))
+            {
+                while(randNums.contains(randNum)) {
+                    randNum = rand.nextInt(16);
+                }
+            }
+                buttons.get(randNum).setEnabled(false);
+                buttons.get(randNum).setIcon(null);
+                buttons.get(randNum).setText(assignments.get(randNum));
+                randNums.add(randNum);
+                randNum= rand.nextInt(15);
+        }
+        Timer tmr= new Timer(1000, ((ignored) -> { // Wait 500ms before re-enabling the buttons
+            for ( int num: randNums)
+            {
+                buttons.get(num).setText("");
+                buttons.get(num).setIcon(back);
+                buttons.get(num).setEnabled(true);
+            }
+        }));
+        tmr.setRepeats(false);
+        tmr.start();
     }
 
     public static void main(String[] args) {
@@ -20,6 +65,7 @@ public class Main {
         ArrayList<String>  assignments = Memorymaster.assignButtons(buttons);
 
         JFrame frame = new JFrame("Memory Master");
+        frame.getContentPane().setBackground(new java.awt.Color(49, 150, 48));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800,800);
         frame.setFocusable(true);
@@ -27,17 +73,24 @@ public class Main {
        // JPanel panel = new JPanel();
         frame.setLayout(new GridLayout(5,5));
 
-        Font sfont =new Font("Arial", Font.PLAIN, 40);
-        UIManager.put("Button.font", sfont);
-        UIManager.put("Label.font", sfont);
+        Font bfont =new Font("", Font.PLAIN, 60);
+        Font lfont =new Font("Times New Roman", Font.BOLD, 50);
+        Icon back = new ImageIcon("src/back.png");
+
+        UIManager.put("Button.font", bfont);
+        UIManager.put("Label.font", lfont);
 
        JLabel l1 = new JLabel("Tries: " + mem.getLives());
+       l1.setForeground(Color.WHITE);
        JLabel l2 = new JLabel("");
        JLabel l3 = new JLabel("");
        JLabel l4 = new JLabel("");
 
         for(int i = 0; i < 16; i++) {
             JButton button = new JButton();
+            button.setIcon(back);
+            button.setBackground(Color.WHITE);
+
             buttons.add(button);
         }
 
@@ -46,6 +99,8 @@ public class Main {
         frame.add(l2);
         frame.add(l3);
         frame.add(l4);
+
+        startGame(buttons,assignments,back);
 
         int i = 0;
         for (JButton currbutton : buttons)
@@ -57,11 +112,12 @@ public class Main {
                 public void actionPerformed(ActionEvent e)
                 {
                     try {
+                        currbutton.setIcon(null);
                         Memorymaster.handleBtnClick(currbutton, assignments);
                         l1.setText("Tries: " + mem.getLives());
                         if(mem.getLives() ==0)
                         {
-                            endGame(buttons);
+                            endGame(buttons,assignments);
                         }
                     }
                     catch (InterruptedException ex) {
@@ -71,8 +127,6 @@ public class Main {
             });
             i++;
         }
-
         frame.setVisible(true);
-
     }
 }
