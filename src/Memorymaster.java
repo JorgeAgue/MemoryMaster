@@ -9,7 +9,9 @@ public class Memorymaster {
     static JButton prevBtn = null;
     static String currentVal ="";
 
-    static int lives =5;
+    static int lives = 5;
+
+    static int pairsMade= 0;
 
     static final Icon back = new ImageIcon("src/back.png");
 
@@ -20,6 +22,14 @@ public class Memorymaster {
 
     public void setLives(int lives){
         this.lives = lives;
+    }
+    public int getPairsMade()
+    {
+        return pairsMade;
+    }
+
+    public void setPairsMade(int pairsMade){
+        this.pairsMade = pairsMade;
     }
 
     //Randomizes the order of the icons and stores them in an array
@@ -54,7 +64,6 @@ public class Memorymaster {
 
     static  void handleBtnClick(JButton button, ArrayList<String>  assignments) throws InterruptedException
     {
-
         JButton clickedBtn = button;
         clickedBtn.setEnabled(false);
         int assignedIndex= Integer.parseInt(clickedBtn.getName()); //Gets the index of button to access its assignment
@@ -90,6 +99,7 @@ public class Memorymaster {
                 //Remove both buttons from play
 
                 currentVal = ""; //Reset the current value
+                pairsMade++;
 
             }
             else //Else stored icon and 2nd button not equal

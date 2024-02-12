@@ -6,11 +6,10 @@ import java.awt.event.*;
 import java.util.Random;
 
 public class Main {
-
-    static void endGame(List<JButton> buttons, ArrayList<String> assignments)
+    static ArrayList<String> assignments;
+    static void endGame(List<JButton> buttons, boolean hasWon)
     {
-
-        if(true) {
+        if(!hasWon) {
             int i = 0;
             for (JButton button : buttons) {
                 button.setEnabled(false);
@@ -20,14 +19,17 @@ public class Main {
                 i++;
             }
             System.out.println("You lost");
-
+            JOptionPane.showMessageDialog(null, "You lose...", "Game has ended", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
         }
         else {
             System.out.println("You won");
+            JOptionPane.showMessageDialog(null, "You won!", "Game has ended", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
         }
     }
 
-    static void startGame(List<JButton> buttons, ArrayList<String> assignments, Icon back) //Reveal some of the cards at the beginning of the game
+    static void startGame(List<JButton> buttons, Icon back) //Reveal some of the cards at the beginning of the game
     {
         Random rand = new Random();
         int randNum= rand.nextInt(16);
@@ -59,10 +61,25 @@ public class Main {
         tmr.start();
     }
 
+    static void restartGame(List<JButton> buttons, Icon back, int tries)
+    {
+        Memorymaster mem= new Memorymaster();
+        mem.setLives(tries);
+        //Need to fix the reset lives counter only updating after clicking
+        assignments = Memorymaster.assignButtons(buttons);
+        for (JButton currbutton : buttons)
+        {
+            currbutton.setIcon(back); //Icon on most recently clicked is slanted after restart
+            currbutton.setVisible(true);
+            currbutton.setEnabled(true);
+        }
+        startGame(buttons, back);
+    }
     public static void main(String[] args) {
         Memorymaster mem= new Memorymaster();
         List<JButton> buttons = new ArrayList<JButton>();
-        ArrayList<String>  assignments = Memorymaster.assignButtons(buttons);
+        assignments = Memorymaster.assignButtons(buttons);
+       int tries= 5;
 
         JFrame frame = new JFrame("Memory Master");
         frame.getContentPane().setBackground(new java.awt.Color(49, 150, 48));
@@ -86,13 +103,38 @@ public class Main {
        JLabel l3 = new JLabel("");
        JLabel l4 = new JLabel("");
 
-        for(int i = 0; i < 16; i++) {
+       //Add the buttons to the frame
+       for(int i = 0; i < 16; i++) {
             JButton button = new JButton();
             button.setIcon(back);
             button.setBackground(Color.WHITE);
-
             buttons.add(button);
         }
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu  menu= new JMenu("Options");
+        JMenu  difmenu= new JMenu("Difficulty");
+        JMenuItem retry= new JMenuItem("Retry");
+
+        JMenuItem easyM= new JMenuItem("Easy");
+        JMenuItem normM= new JMenuItem("Normal");
+        JMenuItem hardM= new JMenuItem("Hard");
+
+        retry.addActionListener(e -> {restartGame(buttons, back, tries);});
+
+        easyM.addActionListener(e -> {restartGame(buttons, back, tries+1);});
+        normM.addActionListener(e -> {restartGame(buttons, back, tries);});
+        hardM.addActionListener(e -> {restartGame(buttons, back, tries-1);});
+
+        menu.add(retry);
+
+        menuBar.add(menu);
+        menuBar.add(difmenu);
+
+        difmenu.add(easyM);
+        difmenu.add(normM);
+        difmenu.add(hardM);
+        frame.setJMenuBar(menuBar);
 
         //b1.setPreferredSize(new Dimension(100, 30));
         frame.add(l1);
@@ -100,7 +142,7 @@ public class Main {
         frame.add(l3);
         frame.add(l4);
 
-        startGame(buttons,assignments,back);
+        startGame(buttons,back);
 
         int i = 0;
         for (JButton currbutton : buttons)
@@ -117,7 +159,11 @@ public class Main {
                         l1.setText("Tries: " + mem.getLives());
                         if(mem.getLives() ==0)
                         {
-                            endGame(buttons,assignments);
+                            endGame(buttons,false);
+                        }
+                        if(mem.getPairsMade()==8)
+                        {
+                            endGame(buttons,true);
                         }
                     }
                     catch (InterruptedException ex) {
